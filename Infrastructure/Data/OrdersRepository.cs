@@ -23,7 +23,7 @@ namespace Infrastructure.Data
         {
             try
             {
-                return await _dbContext.Orders.ToListAsync();
+                return await _dbContext.Orders.AsNoTracking().ToListAsync();
             }
             catch (Exception ex)
             {
@@ -37,6 +37,7 @@ namespace Infrastructure.Data
             {
                 return await _dbContext.Orders
                            .Where(o => o.OrderDate >= from && o.OrderDate <= to)
+                           .AsNoTracking()
                            .ToListAsync();
             }
             catch (Exception ex)
