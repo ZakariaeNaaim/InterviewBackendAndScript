@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Web.Http.Filters;
 using App.WebApi.Wrappers;
 using Application.Exceptions;
+using Serilog;
 using WebApi.Models;
 
 namespace WebApi.Filters
@@ -14,6 +15,8 @@ namespace WebApi.Filters
         {
             var ex = context.Exception;
             var traceId = Guid.NewGuid().ToString(); // TODO: replace by correlation ID
+
+            Log.Error(ex, "Unhandled exception. TraceId={TraceId}", traceId);
 
             var error = new ApiErrorResponse
             {
