@@ -28,9 +28,6 @@ namespace WebApi.Controllers
         {
             var result = await _metricsService.GetMetricsAsync(topNSku);
 
-            if (result == null)
-                return AppResult<MetricsResultDto>.NotFound();
-
             return AppResult<MetricsResultDto>.Ok(result);
         }
     }

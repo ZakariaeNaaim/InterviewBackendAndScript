@@ -1,12 +1,9 @@
 ﻿using Application.Dtos;
+using Application.Exceptions;
 using Application.Interfaces;
 using Application.Interfaces.IServices;
 using Application.Mappers;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Application.Services
@@ -22,7 +19,17 @@ namespace Application.Services
 
         public async Task<MetricsResultDto> GetMetricsAsync(int topN)
         {
-            var orders = await _csvOrderRepo.GetAllAsync();
+            if (topN <= 0)
+            {
+                throw new ValidationException(
+                    nameof(topN),
+                    "The number of top SKUs must be greater than zero.");
+            }
+
+            var orders = await _csvOrderRepo.GetAllAsync().ConfigureAwait(false);
+
+            if (!orders.Any())
+                throw new BusinessRuleException(nameof(GetMetricsAsync),"No orders data available to compute metrics.");
 
             var dailyTotals = orders
                 .GroupBy(o => o.OrderDate.Date)

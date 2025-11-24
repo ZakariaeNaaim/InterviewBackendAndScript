@@ -29,13 +29,7 @@ namespace WebApi.Controllers
         [Route("search")]
         public async Task<AppResult<PagedList<OrderDto>>> SearchOrders([FromBody] OrderPagedRequestDto request)
         {
-            if (request == null)
-                return AppResult<PagedList<OrderDto>>.BadRequest("Invalid request.");
-
             var result = await _ordersService.GetOrdersByCriteriaAsync(request);
-
-            if (result == null)
-                return AppResult<PagedList<OrderDto>>.NotFound();
 
             return AppResult<PagedList<OrderDto>>.Ok(result);
         }
@@ -51,9 +45,6 @@ namespace WebApi.Controllers
         [Route("")]
         public async Task<AppResult<OrderDto>> Post([FromBody] OrderDto orderDto)
         {
-            if(orderDto == null)
-                return AppResult<OrderDto>.BadRequest("Order data is required.");
-
             return AppResult<OrderDto>.Ok(await _ordersService.CreateOrder(orderDto));
         }
     }

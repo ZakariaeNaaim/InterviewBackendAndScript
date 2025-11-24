@@ -25,47 +25,26 @@ namespace Infrastructure.Data
 
         public async Task<PagedList<Order>> GetAllAsync()
         {
-            try
-            {
-                var query = _dbContext.Orders.AsNoTracking();
-                return await PagedList<Order>.CreateAsync(query,1,10).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+            var query = _dbContext.Orders.AsNoTracking();
+            return await PagedList<Order>.CreateAsync(query,1,10).ConfigureAwait(false);
         }
 
         public async Task<PagedList<Order>> GetOrdersByCriteriaAsync(OrderPagedRequestDto orderPagedRequestDto)
         {
-            try
-            {
-                var query = _dbContext.Orders
-                   .Where(o => o.OrderDate >= orderPagedRequestDto.From && o.OrderDate <= orderPagedRequestDto.To)
-                   .OrderBy(o => o.OrderDate)
-                   .AsNoTracking();
+            var query = _dbContext.Orders
+                .Where(o => o.OrderDate >= orderPagedRequestDto.From && o.OrderDate <= orderPagedRequestDto.To)
+                .OrderBy(o => o.OrderDate)
+                .AsNoTracking();
 
-                return await PagedList<Order>.CreateAsync(query, orderPagedRequestDto.Page, orderPagedRequestDto.PageSize).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+            return await PagedList<Order>.CreateAsync(query, orderPagedRequestDto.Page, orderPagedRequestDto.PageSize).ConfigureAwait(false);
         }
 
 
         public async Task<Order> AddAsync(Order order)
         {
-            try
-            {
-                _dbContext.Orders.Add(order);
-                await _dbContext.SaveChangesAsync().ConfigureAwait(false);
-                return order;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+            _dbContext.Orders.Add(order);
+            await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+            return order;
         }
     }
 }

@@ -30,6 +30,20 @@ namespace Application.Services
         }
         public async Task<PagedList<OrderDto>> GetOrdersByCriteriaAsync(OrderPagedRequestDto request)
         {
+            if (request == null)
+            {
+                throw new ValidationException(
+                    nameof(request),
+                    "Order search request cannot be null.");
+            }
+
+            if (request.From.HasValue && request.To.HasValue && request.From > request.To)
+            {
+                throw new ValidationException(
+                    nameof(OrderPagedRequestDto),
+                    "'From' date cannot be greater than 'To' date.");
+            }
+
             var pagedOrders = await _orderRepo.GetOrdersByCriteriaAsync(request).ConfigureAwait(false);
 
             return pagedOrders.Convert(OrderToOrderDtoMapper.Map);
@@ -38,7 +52,11 @@ namespace Application.Services
         public async Task<OrderDto> CreateOrder(OrderDto orderDto)
         {
             if (orderDto == null)
-                throw new ValidationException(nameof(orderDto));
+            {
+                throw new ValidationException(
+                    nameof(orderDto),
+                    "Order payload cannot be null.");
+            }
 
             var order = OrderDtoToOrderMapper.Map(orderDto);
 

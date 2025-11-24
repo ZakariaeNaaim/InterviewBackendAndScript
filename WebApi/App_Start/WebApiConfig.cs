@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
 using System.Web.Http.Cors;
+using WebApi.Filters;
 
 namespace WebApi
 {
@@ -22,6 +23,7 @@ namespace WebApi
                 defaults: new { id = RouteParameter.Optional }
             );
             config.Formatters.Remove(config.Formatters.XmlFormatter);
+            config.Filters.Add(new GlobalExceptionFilter());
         }
     }
 }
