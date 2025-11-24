@@ -1,8 +1,12 @@
-﻿using Application.Interfaces.IRepositories;
+﻿using Application.Dtos.Orders;
+using Application.Dtos.Pagination;
+using Application.Interfaces.IRepositories;
 using Domain.Entities;
+using Infrastructure.Data.Pagination;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Drawing.Printing;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
@@ -19,11 +23,12 @@ namespace Infrastructure.Data
             _dbContext = dbContext;
         }
 
-        public async Task<IEnumerable<Order>> GetAllAsync()
+        public async Task<PagedList<Order>> GetAllAsync()
         {
             try
             {
-                return await _dbContext.Orders.AsNoTracking().ToListAsync();
+                var query = _dbContext.Orders.AsNoTracking();
+                return await PagedList<Order>.CreateAsync(query,1,10).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -31,14 +36,16 @@ namespace Infrastructure.Data
             }
         }
 
-        public async Task<IEnumerable<Order>> GetOrdersByStatusFromToAsync(DateTime? from, DateTime? to)
+        public async Task<PagedList<Order>> GetOrdersByCriteriaAsync(OrderPagedRequestDto orderPagedRequestDto)
         {
             try
             {
-                return await _dbContext.Orders
-                           .Where(o => o.OrderDate >= from && o.OrderDate <= to)
-                           .AsNoTracking()
-                           .ToListAsync();
+                var query = _dbContext.Orders
+                   .Where(o => o.OrderDate >= orderPagedRequestDto.From && o.OrderDate <= orderPagedRequestDto.To)
+                   .OrderBy(o => o.OrderDate)
+                   .AsNoTracking();
+
+                return await PagedList<Order>.CreateAsync(query, orderPagedRequestDto.Page, orderPagedRequestDto.PageSize).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -52,7 +59,7 @@ namespace Infrastructure.Data
             try
             {
                 _dbContext.Orders.Add(order);
-                await _dbContext.SaveChangesAsync();
+                await _dbContext.SaveChangesAsync().ConfigureAwait(false);
                 return order;
             }
             catch (Exception ex)

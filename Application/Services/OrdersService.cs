@@ -1,9 +1,11 @@
 ﻿using Application.Dtos;
+using Application.Dtos.Orders;
 using Application.Exceptions;
 using Application.Interfaces.IRepositories;
 using Application.Interfaces.IServices;
 using Application.Mappers;
 using Domain.Entities;
+using Infrastructure.Data.Pagination;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,26 +22,27 @@ namespace Application.Services
             _orderRepo = orderRepo;
         }
 
-        public async Task<List<OrderDto>> Get()
+        public async Task<PagedList<OrderDto>> Get()
         {
-            IEnumerable<Order> orders = await _orderRepo.GetAllAsync(); 
-            return orders?.Select(OrderToOrderDtoMapper.Map).ToList();
+            var pagedOrders = await _orderRepo.GetAllAsync().ConfigureAwait(false);
+
+            return pagedOrders.Convert(OrderToOrderDtoMapper.Map);
+        }
+        public async Task<PagedList<OrderDto>> GetOrdersByCriteriaAsync(OrderPagedRequestDto request)
+        {
+            var pagedOrders = await _orderRepo.GetOrdersByCriteriaAsync(request).ConfigureAwait(false);
+
+            return pagedOrders.Convert(OrderToOrderDtoMapper.Map);
         }
 
-        public async Task<Order> CreateOrder(OrderDto orderDto)
+        public async Task<OrderDto> CreateOrder(OrderDto orderDto)
         {
             if (orderDto == null)
                 throw new ValidationException(nameof(orderDto));
 
             var order = OrderDtoToOrderMapper.Map(orderDto);
 
-            return await _orderRepo.AddAsync(order);
-        }
-
-        public async Task<List<OrderDto>> GetOrdersByStatusFromTo(DateTime? from, DateTime? to)
-        {
-            var orders = await _orderRepo.GetOrdersByStatusFromToAsync(from, to);
-            return orders.Select(OrderToOrderDtoMapper.Map).ToList();
+            return OrderToOrderDtoMapper.Map(await _orderRepo.AddAsync(order).ConfigureAwait(false));
         }
     }
 }

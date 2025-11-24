@@ -1,5 +1,7 @@
 ﻿using Application.Dtos;
+using Application.Dtos.Orders;
 using Domain.Entities;
+using Infrastructure.Data.Pagination;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,8 +12,8 @@ namespace Application.Interfaces.IServices
 {
     public interface IOrdersService
     {
-        Task<List<OrderDto>> Get();
-        Task<List<OrderDto>> GetOrdersByStatusFromTo(DateTime? from,DateTime? to );
-        Task<Order> CreateOrder(OrderDto order);
+        Task<PagedList<OrderDto>> Get();
+        Task<PagedList<OrderDto>> GetOrdersByCriteriaAsync(OrderPagedRequestDto orderPagedRequestDto);
+        Task<OrderDto> CreateOrder(OrderDto order);
     }
 }
