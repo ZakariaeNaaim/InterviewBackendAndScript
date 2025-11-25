@@ -1,9 +1,11 @@
+using Application.DependencyInjection;
 using Application.Interfaces;
 using Application.Interfaces.IRepositories;
 using Application.Interfaces.IServices;
 using Application.Services;
 using Infrastructure.Data;
 using Infrastructure.Data.Orders;
+using Infrastructure.DependencyInjection;
 using System.Web;
 using System.Web.Http;
 using Unity;
@@ -15,20 +17,15 @@ namespace WebApi
 {
     public static class UnityConfig
     {
-        const string ordersCsvPath = "~/App_Data/orders.csv";
+        private const string OrdersCsvPath = "~/App_Data/orders.csv";
         public static void RegisterComponents()
         {
 			var container = new UnityContainer();
 
-            container.RegisterType<ICsvOrderRepository, CsvOrderRepository>(
-                new ContainerControlledLifetimeManager(),
-               new InjectionConstructor(HttpContext.Current.Server.MapPath(ordersCsvPath))
-           );
+            var csvPath = HttpContext.Current.Server.MapPath(OrdersCsvPath);
 
-            container.RegisterType<AppDbContext>(new HierarchicalLifetimeManager());
-            container.RegisterType<IOrdersRepository, OrdersRepository>();
-            container.RegisterType<IOrdersService, OrdersService>();
-            container.RegisterType<IMetricsService, MetricsService>();
+            InfrastructureDependencyRegistrar.Register(container, csvPath);
+            ApplicationDependencyRegistrar.Register(container);
 
             GlobalConfiguration.Configuration.DependencyResolver = new UnityDependencyResolver(container);
         }
