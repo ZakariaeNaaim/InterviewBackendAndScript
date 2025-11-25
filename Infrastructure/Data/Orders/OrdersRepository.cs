@@ -25,7 +25,7 @@ namespace Infrastructure.Data
 
         public async Task<PagedList<Order>> GetAllAsync()
         {
-            var query = _dbContext.Orders.AsNoTracking();
+            var query = _dbContext.Orders.OrderBy(o=> o.Id).AsNoTracking();
             return await PagedList<Order>.CreateAsync(query,1,10).ConfigureAwait(false);
         }
 
